@@ -1,7 +1,7 @@
 
 import { MovieCard } from './MovieCard';
 import '../styles/content.scss';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { api } from '../services/api';
 
 interface MovieProps {
@@ -24,11 +24,11 @@ interface SelectInterface {
   }
 }
 
-export function Content(props: SelectInterface) {
+function ContentComponent(props: SelectInterface) {
   const [movies, setMovies] = useState<MovieProps[]>([]);
   const { selectedGenre, selectedGenreId} = props;
   
-  useEffect(() => {
+  useMemo(() => {
     api.get<MovieProps[]>(`movies/?Genre_id=${selectedGenreId}`).then(response => {
       setMovies(response.data);
     });
@@ -48,3 +48,8 @@ export function Content(props: SelectInterface) {
         </main>
       </div>)
 }
+
+
+export const Content = memo(ContentComponent, (prevProps, nextProps) => {
+  return Object.is(prevProps.selectedGenreId, nextProps.selectedGenreId)
+})

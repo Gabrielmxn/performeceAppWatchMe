@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo, useMemo, useCallback } from 'react';
 
 import { api } from '../services/api';
 import { Button } from './Button';
@@ -13,21 +13,21 @@ interface FunctionProps{
   handleClickButtons: (id: number) => void;
 }
 
-export function SideBar(props: FunctionProps) {
+function SideBarComponent(props: FunctionProps) {
   const [selectedGenreId, setSelectedGenreId] = useState(1);
   const [genres, setGenres] = useState<GenreResponseProps[]>([]);
 
 
-  useEffect(() => {
+  useMemo(() => {
     api.get<GenreResponseProps[]>('genres').then(response => {
       setGenres(response.data);
     });
   }, []);
-  
-  function handleClickButton(id: number) {
+ 
+  const handleClickButton = useCallback((id: number) => {
     setSelectedGenreId(id);
     props.handleClickButtons(id);
-  } 
+  }, [])  
   
   return(
     <nav className="sidebar">
@@ -50,3 +50,5 @@ export function SideBar(props: FunctionProps) {
   </nav>
   )
 }
+
+export const SideBar = memo(SideBarComponent)
